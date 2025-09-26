@@ -88,7 +88,25 @@ async def test_search_issues_tool_formats_results():
     server = create_mcp(config=config, client=stub_client)
 
     async with Client(server) as client:
-        result = await client.call_tool("search_issues", {"project": "sample"})
+        result = await client.call_tool(
+            "search_issues",
+            {
+                "components": ["sample"],
+                "issue_statuses": ["OPEN"],
+                "resolved": False,
+                "sort_field": "CREATION_DATE",
+                "ascending": False,
+                "created_after": "2024-01-01",
+                "languages": ["cs"],
+            },
+        )
 
-    stub_client.search_issues.assert_awaited_once()
+    stub_call = stub_client.search_issues.await_args.kwargs
+    assert stub_call["components"] == ["sample"]
+    assert stub_call["issueStatuses"] == ["OPEN"]
+    assert stub_call["resolved"] is False
+    assert stub_call["s"] == "CREATION_DATE"
+    assert stub_call["asc"] is False
+    assert stub_call["createdAfter"] == "2024-01-01"
+    assert stub_call["languages"] == ["cs"]
     assert result.data["issues"][0]["componentPath"] == "src/file.cs"

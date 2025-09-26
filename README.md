@@ -59,7 +59,7 @@ Supported transports mirror the ones from FastMCP (`stdio`, `http`, `sse`).
 | Tool | Purpose | Key arguments |
 | --- | --- | --- |
 | `get_issue_context` | Fetch a single issue by key, pull its rule, and return a markdown-rich brief plus machine-readable metadata. | `issue_key` (string) |
-| `search_issues` | Wrapper around `/api/issues/search` that exposes the most common filters and augments each result with the component path. | `issue_keys`, `project`, `component_keys`, `severities`, `statuses`, `types`, `tags`, `assignees`, `page`, `page_size` |
+| `search_issues` | Wrapper around `/api/issues/search` that exposes the most common filters and augments each result with the component path. | `issue_keys`, `components`, `severities`, `issue_statuses`, `resolutions`, `types`, `tags`, `assignees`, `languages`, `created_after`, `created_before`, `resolved`, `sort_field`, `ascending`, `page`, `page_size` |
 | `get_rule` | Retrieve raw rule metadata from `/api/rules/show`. | `rule_key` (string) |
 
 All tools return JSON-serialisable dictionaries, making them easy to chain in agent workflows.

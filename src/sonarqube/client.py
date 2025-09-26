@@ -99,7 +99,9 @@ def _prepare_params(filters: Mapping[str, Any]) -> Dict[str, Any]:
     for key, value in filters.items():
         if value is None:
             continue
-        if isinstance(value, (list, tuple, set)):
+        if isinstance(value, bool):
+            prepared[key] = "true" if value else "false"
+        elif isinstance(value, (list, tuple, set)):
             prepared[key] = ",".join(str(item) for item in value)
         else:
             prepared[key] = str(value)

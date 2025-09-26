@@ -1,0 +1,576 @@
+{
+          "key": "search",
+          "description": "Search for issues.\u003Cbr\u003ERequires the 'Browse' permission on the specified project(s). \u003Cbr\u003EFor applications, it also requires 'Browse' permission on its child projects.\u003Cbr/\u003EWhen issue indexing is in progress returns 503 service unavailable HTTP code.",
+          "since": "3.6",
+          "internal": false,
+          "post": false,
+          "hasResponseExample": true,          
+          "params": [
+            {
+              "key": "additionalFields",
+              "description": "Comma-separated list of the optional fields to be returned in response. Action plans are dropped in 5.5, it is not returned in the response.",
+              "since": "5.2",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "_all",
+                "comments",
+                "languages",
+                "rules",
+                "ruleDescriptionContextKey",
+                "transitions",
+                "actions",
+                "users"
+              ]
+            },
+            {
+              "key": "asc",
+              "description": "Ascending sort",
+              "required": false,
+              "internal": false,
+              "defaultValue": "true",
+              "possibleValues": [
+                "true",
+                "false",
+                "yes",
+                "no"
+              ]
+            },
+            {
+              "key": "assigned",
+              "description": "To retrieve assigned or unassigned issues",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "true",
+                "false",
+                "yes",
+                "no"
+              ]
+            },
+            {
+              "key": "assignees",
+              "description": "Comma-separated list of assignee logins. The value '__me__' can be used as a placeholder for user who performs the request",
+              "required": false,
+              "internal": false,
+              "exampleValue": "admin,usera,__me__"
+            },
+            {
+              "key": "author",
+              "description": "SCM accounts. To set several values, the parameter must be called once for each value.",
+              "required": false,
+              "internal": false,
+              "exampleValue": "author=torvalds@linux-foundation.org&author=linux@fondation.org"
+            },
+            {
+              "key": "branch",
+              "description": "Branch key. Not available in the community edition.",
+              "since": "6.6",
+              "required": false,
+              "internal": false,
+              "exampleValue": "feature/my_branch"
+            },
+            {
+              "key": "casa",
+              "description": "Comma-separated list of CASA categories.",
+              "since": "10.7",
+              "required": false,
+              "internal": false
+            },
+            {
+              "key": "cleanCodeAttributeCategories",
+              "description": "Comma-separated list of Clean Code Attribute Categories",
+              "since": "10.2",
+              "required": false,
+              "internal": false,
+              "exampleValue": "ADAPTABLE,INTENTIONAL",
+              "possibleValues": [
+                "ADAPTABLE",
+                "CONSISTENT",
+                "INTENTIONAL",
+                "RESPONSIBLE"
+              ]
+            },
+            {
+              "key": "codeVariants",
+              "description": "Comma-separated list of code variants.",
+              "since": "10.1",
+              "required": false,
+              "internal": false,
+              "exampleValue": "windows,linux"
+            },
+            {
+              "key": "components",
+              "description": "Comma-separated list of component keys. Retrieve issues associated to a specific list of components (and all its descendants). A component can be a portfolio, project, module, directory or file.",
+              "required": false,
+              "internal": false,
+              "exampleValue": "my_project",
+              "deprecatedKey": "componentKeys",
+              "deprecatedKeySince": "10.2"
+            },
+            {
+              "key": "createdAfter",
+              "description": "To retrieve issues created after the given date (inclusive). \u003Cbr\u003EEither a date (use 'timeZone' attribute or it will default to server timezone) or datetime can be provided. \u003Cbr\u003EIf this parameter is set, createdInLast must not be set",
+              "required": false,
+              "internal": false,
+              "exampleValue": "2017-10-19 or 2017-10-19T13:00:00+0200"
+            },
+            {
+              "key": "createdAt",
+              "description": "Datetime to retrieve issues created during a specific analysis",
+              "required": false,
+              "internal": false,
+              "exampleValue": "2017-10-19T13:00:00+0200"
+            },
+            {
+              "key": "createdBefore",
+              "description": "To retrieve issues created before the given date (exclusive). \u003Cbr\u003EEither a date (use 'timeZone' attribute or it will default to server timezone) or datetime can be provided.",
+              "required": false,
+              "internal": false,
+              "exampleValue": "2017-10-19 or 2017-10-19T13:00:00+0200"
+            },
+            {
+              "key": "createdInLast",
+              "description": "To retrieve issues created during a time span before the current time (exclusive). Accepted units are 'y' for year, 'm' for month, 'w' for week and 'd' for day. If this parameter is set, createdAfter must not be set",
+              "required": false,
+              "internal": false,
+              "exampleValue": "1m2w (1 month 2 weeks)"
+            },
+            {
+              "key": "cwe",
+              "description": "Comma-separated list of CWE identifiers. Use 'unknown' to select issues not associated to any CWE.",
+              "required": false,
+              "internal": false,
+              "exampleValue": "12,125,unknown"
+            },
+            {
+              "key": "facets",
+              "description": "Comma-separated list of the facets to be computed. No facet is computed by default.",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "projects",
+                "files",
+                "assigned_to_me",
+                "severities",
+                "statuses",
+                "resolutions",
+                "rules",
+                "assignees",
+                "author",
+                "directories",
+                "scopes",
+                "languages",
+                "tags",
+                "types",
+                "pciDss-3.2",
+                "pciDss-4.0",
+                "owaspAsvs-4.0",
+                "owaspMobileTop10-2024",
+                "owaspTop10",
+                "owaspTop10-2021",
+                "stig-ASD_V5R3",
+                "casa",
+                "sansTop25",
+                "cwe",
+                "createdAt",
+                "sonarsourceSecurity",
+                "codeVariants",
+                "cleanCodeAttributeCategories",
+                "impactSoftwareQualities",
+                "impactSeverities",
+                "issueStatuses",
+                "prioritizedRule"
+              ]
+            },
+            {
+              "key": "fixedInPullRequest",
+              "description": "Pull request id to filter issues that would be fixed in the specified project or branch by the pull request. Should not be used together with + 'pullRequest'. At least the 'components' must be be specified when this param is used.  Not available in the community edition.",
+              "since": "10.4",
+              "required": false,
+              "internal": false,
+              "exampleValue": "5461"
+            },
+            {
+              "key": "impactSeverities",
+              "description": "Comma-separated list of Software Quality Severities",
+              "since": "10.2",
+              "required": false,
+              "internal": false,
+              "exampleValue": "HIGH,MEDIUM",
+              "possibleValues": [
+                "INFO",
+                "LOW",
+                "MEDIUM",
+                "HIGH",
+                "BLOCKER"
+              ]
+            },
+            {
+              "key": "impactSoftwareQualities",
+              "description": "Comma-separated list of Software Qualities",
+              "since": "10.2",
+              "required": false,
+              "internal": false,
+              "exampleValue": "MAINTAINABILITY,RELIABILITY",
+              "possibleValues": [
+                "MAINTAINABILITY",
+                "RELIABILITY",
+                "SECURITY"
+              ]
+            },
+            {
+              "key": "inNewCodePeriod",
+              "description": "To retrieve issues created in the new code period.\u003Cbr\u003EIf this parameter is set to a truthy value, createdAfter must not be set and one component uuid or key must be provided.\u003Cbr\u003EThis parameter is ignored if the requested component is Application or Portfolio.",
+              "since": "9.4",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "true",
+                "false",
+                "yes",
+                "no"
+              ]
+            },
+            {
+              "key": "issueStatuses",
+              "description": "",
+              "since": "10.4",
+              "required": false,
+              "internal": false,
+              "exampleValue": "ACCEPTED,FIXED",
+              "possibleValues": [
+                "OPEN",
+                "CONFIRMED",
+                "FALSE_POSITIVE",
+                "ACCEPTED",
+                "FIXED"
+              ]
+            },
+            {
+              "key": "issues",
+              "description": "Comma-separated list of issue keys",
+              "required": false,
+              "internal": false,
+              "exampleValue": "5bccd6e8-f525-43a2-8d76-fcb13dde79ef"
+            },
+            {
+              "key": "languages",
+              "description": "Comma-separated list of languages. Available since 4.4",
+              "required": false,
+              "internal": false,
+              "exampleValue": "java,js"
+            },
+            {
+              "key": "onComponentOnly",
+              "description": "Return only issues at a component's level, not on its descendants (modules, directories, files, etc). This parameter is only considered when componentKeys is set.",
+              "required": false,
+              "internal": false,
+              "defaultValue": "false",
+              "possibleValues": [
+                "true",
+                "false",
+                "yes",
+                "no"
+              ]
+            },
+            {
+              "key": "owaspAsvs-4.0",
+              "description": "Comma-separated list of OWASP ASVS v4.0 categories.",
+              "since": "9.7",
+              "required": false,
+              "internal": false,
+              "exampleValue": "6,10.1.1"
+            },
+            {
+              "key": "owaspAsvsLevel",
+              "description": "Level of OWASP ASVS categories.",
+              "since": "9.7",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "1",
+                "2",
+                "3"
+              ]
+            },
+            {
+              "key": "owaspMobileTop10-2024",
+              "description": "Comma-separated list of OWASP Mobile Top 10 2024 lowercase categories.",
+              "since": "2025.3",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "m1",
+                "m2",
+                "m3",
+                "m4",
+                "m5",
+                "m6",
+                "m7",
+                "m8",
+                "m9",
+                "m10"
+              ]
+            },
+            {
+              "key": "owaspTop10",
+              "description": "Comma-separated list of OWASP Top 10 2017 lowercase categories.",
+              "since": "7.3",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "a1",
+                "a2",
+                "a3",
+                "a4",
+                "a5",
+                "a6",
+                "a7",
+                "a8",
+                "a9",
+                "a10"
+              ]
+            },
+            {
+              "key": "owaspTop10-2021",
+              "description": "Comma-separated list of OWASP Top 10 2021 lowercase categories.",
+              "since": "9.4",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "a1",
+                "a2",
+                "a3",
+                "a4",
+                "a5",
+                "a6",
+                "a7",
+                "a8",
+                "a9",
+                "a10"
+              ]
+            },
+            {
+              "key": "p",
+              "description": "1-based page number",
+              "required": false,
+              "internal": false,
+              "defaultValue": "1",
+              "exampleValue": "42"
+            },
+            {
+              "key": "pciDss-3.2",
+              "description": "Comma-separated list of PCI DSS v3.2 categories.",
+              "since": "9.6",
+              "required": false,
+              "internal": false,
+              "exampleValue": "4,6.5.8,10.1"
+            },
+            {
+              "key": "pciDss-4.0",
+              "description": "Comma-separated list of PCI DSS v4.0 categories.",
+              "since": "9.6",
+              "required": false,
+              "internal": false,
+              "exampleValue": "4,6.5.8,10.1"
+            },
+            {
+              "key": "prioritizedRule",
+              "description": "To match issues with prioritized rule or not",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "true",
+                "false",
+                "yes",
+                "no"
+              ]
+            },
+            {
+              "key": "ps",
+              "description": "Page size. Must be greater than 0 and less or equal than 500",
+              "required": false,
+              "internal": false,
+              "defaultValue": "100",
+              "exampleValue": "20",
+              "maximumValue": 500
+            },
+            {
+              "key": "pullRequest",
+              "description": "Pull request id. Not available in the community edition.",
+              "since": "7.1",
+              "required": false,
+              "internal": false,
+              "exampleValue": "5461"
+            },
+            {
+              "key": "resolutions",
+              "description": "Comma-separated list of resolutions",
+              "required": false,
+              "internal": false,
+              "exampleValue": "FIXED,REMOVED",
+              "possibleValues": [
+                "FALSE-POSITIVE",
+                "WONTFIX",
+                "FIXED",
+                "REMOVED"
+              ]
+            },
+            {
+              "key": "resolved",
+              "description": "To match resolved or unresolved issues",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "true",
+                "false",
+                "yes",
+                "no"
+              ]
+            },
+            {
+              "key": "rules",
+              "description": "Comma-separated list of coding rule keys. Format is &lt;repository&gt;:&lt;rule&gt;",
+              "required": false,
+              "internal": false,
+              "exampleValue": "java:S1144"
+            },
+            {
+              "key": "s",
+              "description": "Sort field",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "UPDATE_DATE",
+                "HOTSPOTS",
+                "FILE_LINE",
+                "STATUS",
+                "SEVERITY",
+                "CLOSE_DATE",
+                "CREATION_DATE"
+              ]
+            },
+            {
+              "key": "sansTop25",
+              "description": "Comma-separated list of SANS Top 25 categories.",
+              "since": "7.3",
+              "required": false,
+              "internal": false,
+              "deprecatedSince": "10.0",
+              "possibleValues": [
+                "insecure-interaction",
+                "risky-resource",
+                "porous-defenses"
+              ]
+            },
+            {
+              "key": "scopes",
+              "description": "Comma-separated list of scopes. Available since 8.5",
+              "required": false,
+              "internal": false,
+              "exampleValue": "MAIN,TEST",
+              "possibleValues": [
+                "MAIN",
+                "TEST"
+              ]
+            },
+            {
+              "key": "severities",
+              "description": "Comma-separated list of severities",
+              "required": false,
+              "internal": false,
+              "exampleValue": "BLOCKER,CRITICAL",
+              "possibleValues": [
+                "INFO",
+                "MINOR",
+                "MAJOR",
+                "CRITICAL",
+                "BLOCKER"
+              ]
+            },
+            {
+              "key": "sonarsourceSecurity",
+              "description": "Comma-separated list of SonarSource security categories. Use 'others' to select issues not associated with any category",
+              "since": "7.8",
+              "required": false,
+              "internal": false,
+              "possibleValues": [
+                "buffer-overflow",
+                "sql-injection",
+                "rce",
+                "object-injection",
+                "command-injection",
+                "path-traversal-injection",
+                "ldap-injection",
+                "xpath-injection",
+                "log-injection",
+                "xxe",
+                "xss",
+                "dos",
+                "ssrf",
+                "csrf",
+                "http-response-splitting",
+                "open-redirect",
+                "weak-cryptography",
+                "auth",
+                "insecure-conf",
+                "file-manipulation",
+                "encrypt-data",
+                "traceability",
+                "permission",
+                "others"
+              ]
+            },
+            {
+              "key": "statuses",
+              "description": "Comma-separated list of statuses",
+              "required": false,
+              "internal": false,
+              "exampleValue": "OPEN,REOPENED",
+              "deprecatedSince": "10.4",
+              "possibleValues": [
+                "OPEN",
+                "CONFIRMED",
+                "REOPENED",
+                "RESOLVED",
+                "CLOSED"
+              ]
+            },
+            {
+              "key": "stig-ASD_V5R3",
+              "description": "Comma-separated list of STIG V5R3 categories.",
+              "since": "10.7",
+              "required": false,
+              "internal": false
+            },
+            {
+              "key": "tags",
+              "description": "Comma-separated list of tags.",
+              "required": false,
+              "internal": false,
+              "exampleValue": "security,convention"
+            },
+            {
+              "key": "timeZone",
+              "description": "To resolve dates passed to 'createdAfter' or 'createdBefore' (does not apply to datetime) and to compute creation date histogram",
+              "since": "8.6",
+              "required": false,
+              "internal": false,
+              "exampleValue": "'Europe/Paris', 'Z' or '+02:00'"
+            },
+            {
+              "key": "types",
+              "description": "Comma-separated list of types.",
+              "since": "5.5",
+              "required": false,
+              "internal": false,
+              "exampleValue": "CODE_SMELL,BUG",
+              "possibleValues": [
+                "CODE_SMELL",
+                "BUG",
+                "VULNERABILITY"
+              ]
+            }
+          ]
+        }

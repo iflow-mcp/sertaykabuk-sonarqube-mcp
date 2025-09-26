@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Optional
+from typing import Annotated, Optional
 
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
@@ -34,7 +34,9 @@ def create_mcp(
     sonar_client = client or SonarQubeClient(config)
 
     @mcp.tool(description="Fetch a single issue and enrich it with rule metadata.")
-    async def get_issue_context(issue_key: str) -> dict:
+    async def get_issue_context(
+        issue_key: Annotated[str, "SonarQube issue key (for example, AXd8...)"]
+    ) -> dict:
         """Return detailed remediation context for a SonarQube issue."""
 
         try:
@@ -63,16 +65,67 @@ def create_mcp(
 
     @mcp.tool(description="Search SonarQube issues using the official search API.")
     async def search_issues(
-        issue_keys: Optional[list[str]] = None,
-        project: Optional[str] = None,
-        component_keys: Optional[list[str]] = None,
-        severities: Optional[list[str]] = None,
-        statuses: Optional[list[str]] = None,
-        types: Optional[list[str]] = None,
-        tags: Optional[list[str]] = None,
-        assignees: Optional[list[str]] = None,
-        page: int = 1,
-        page_size: int = 50,
+        issue_keys: Annotated[
+            Optional[list[str]],
+            "Specific SonarQube issue keys to include (max 50).",
+        ] = None,
+        components: Annotated[
+            Optional[list[str]],
+            "Component keys (project/module/file) to filter issues by.",
+        ] = None,
+        severities: Annotated[
+            Optional[list[str]],
+            "Limit results to the given severities (e.g. BLOCKER, CRITICAL).",
+        ] = None,
+        issue_statuses: Annotated[
+            Optional[list[str]],
+            "Filter by issue statuses (e.g. OPEN, CONFIRMED, FIXED).",
+        ] = None,
+        resolutions: Annotated[
+            Optional[list[str]],
+            "Limit to specific resolutions such as FIXED or WONTFIX.",
+        ] = None,
+        types: Annotated[
+            Optional[list[str]],
+            "Limit to issue types such as BUG, VULNERABILITY, CODE_SMELL.",
+        ] = None,
+        tags: Annotated[
+            Optional[list[str]],
+            "Filter issues that include any of the provided tags.",
+        ] = None,
+        assignees: Annotated[
+            Optional[list[str]],
+            "Restrict to issues assigned to these logins.",
+        ] = None,
+        languages: Annotated[
+            Optional[list[str]],
+            "Limit to issues detected in these languages.",
+        ] = None,
+        created_after: Annotated[
+            Optional[str],
+            "Return issues created after this ISO date/datetime (inclusive).",
+        ] = None,
+        created_before: Annotated[
+            Optional[str],
+            "Return issues created before this ISO date/datetime (exclusive).",
+        ] = None,
+        resolved: Annotated[
+            Optional[bool],
+            "Only resolved (true) or unresolved (false) issues.",
+        ] = None,
+        sort_field: Annotated[
+            Optional[str],
+            "Sort field (CREATION_DATE, UPDATE_DATE, SEVERITY, etc.).",
+        ] = None,
+        ascending: Annotated[
+            Optional[bool],
+            "Sort ascending (true) or descending (false).",
+        ] = None,
+        page: Annotated[int, "Page index (1-based) to retrieve."] = 1,
+        page_size: Annotated[
+            int,
+            "Number of issues per page (1-500).",
+        ] = 50,
     ) -> dict:
         """Run an issues search and surface a concise, agent-friendly payload."""
 
@@ -83,13 +136,19 @@ def create_mcp(
 
         filters = {
             "issues": issue_keys,
-            "project": project,
-            "componentKeys": component_keys,
+            "components": components,
             "severities": severities,
-            "statuses": statuses,
+            "issueStatuses": issue_statuses,
+            "resolutions": resolutions,
             "types": types,
             "tags": tags,
             "assignees": assignees,
+            "languages": languages,
+            "createdAfter": created_after,
+            "createdBefore": created_before,
+            "resolved": resolved,
+            "s": sort_field,
+            "asc": ascending,
             "p": page,
             "ps": page_size,
         }
@@ -140,7 +199,9 @@ def create_mcp(
         }
 
     @mcp.tool(description="Retrieve metadata for a SonarQube rule.")
-    async def get_rule(rule_key: str) -> dict:
+    async def get_rule(
+        rule_key: Annotated[str, "Rule key such as csharpsquid:S2178"]
+    ) -> dict:
         try:
             payload = await sonar_client.fetch_rule(rule_key)
         except SonarQubeAPIError as exc:

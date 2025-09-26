@@ -74,3 +74,40 @@ async def test_fetch_rule_success():
         result = await client.fetch_rule("csharpsquid:S2178")
 
     assert result["rule"]["key"] == "csharpsquid:S2178"
+
+
+@pytest.mark.asyncio
+async def test_search_issues_common_filters():
+    config = SonarQubeConfig(base_url="https://sonarqube.example.com", token="token")
+    client = SonarQubeClient(config)
+
+    response_payload = {
+        "issues": [],
+        "components": [],
+        "total": 0,
+        "paging": {"pageIndex": 1, "pageSize": 20, "total": 0},
+    }
+
+    with respx.mock(assert_all_called=True) as router:
+        router.get(
+            "https://sonarqube.example.com/api/issues/search",
+            params={
+                "components": "project:key",
+                "issueStatuses": "OPEN,CONFIRMED",
+                "resolved": "false",
+                "asc": "true",
+                "s": "CREATION_DATE",
+                "p": "2",
+                "ps": "20",
+            },
+        ).mock(return_value=httpx.Response(200, json=response_payload))
+
+        await client.search_issues(
+            components=["project:key"],
+            issueStatuses=["OPEN", "CONFIRMED"],
+            resolved=False,
+            asc=True,
+            s="CREATION_DATE",
+            p=2,
+            ps=20,
+        )
