@@ -16,12 +16,22 @@ This project packages a Model Context Protocol (MCP) server for AI coding agents
 
 ### Configuration
 
+You must configure the base URL of your SonarQube instance. Authentication can
+be provided in two ways:
+
+1. Per-user Bearer token via an `Authorization: Bearer <token>` HTTP header
+	when using the HTTP/SSE transports (recommended – allows each user/agent to
+	have least-privilege access).
+2. A static environment variable token (`SONARQUBE_TOKEN`) used as a fallback
+	when no header is present (needed for stdio transport where HTTP headers
+	are not available).
+
 Set the following environment variables before starting the server:
 
 | Variable | Description | Example |
 | --- | --- | --- |
 | `SONARQUBE_BASE_URL` | Base URL of your SonarQube instance (no trailing slash) | `https://sonarqube.internal` |
-| `SONARQUBE_TOKEN` | Personal access token with `Browse` access to projects | `squ_XXXXXXXXXXXXXXXXXXXXXXXXXXXX` |
+| `SONARQUBE_TOKEN` *(optional)* | Fallback personal access token with `Browse` access to projects. Used only if no Authorization header is supplied. | `squ_XXXXXXXXXXXXXXXXXXXXXXXXXXXX` |
 | `SONARQUBE_TIMEOUT` *(optional)* | Request timeout in seconds (defaults to `15`) | `20` |
 
 You can store these in a `.env` file or provide them through your process manager.
@@ -52,7 +62,78 @@ To expose an HTTP transport, add the appropriate options when you run it:
 uv run python -m src.main --transport http --host 0.0.0.0 --port 8765
 ```
 
-Supported transports mirror the ones from FastMCP (`stdio`, `http`, `sse`).
+Supported transports mirror the ones from FastMCP (`stdio`, `http`, `sse`). When
+using `http`/`sse`, send an `Authorization` header with each request so the
+server can perform SonarQube calls on behalf of that user:
+
+```
+Authorization: Bearer squ_XXXXXXXXXXXXXXXXXXXXXXXXXXXX
+```
+
+If the header is omitted the server will fall back to `SONARQUBE_TOKEN`.
+
+### Header-based auth example
+
+The server internally inspects incoming headers (via FastMCP's
+`get_http_headers`) on every tool call. A simplified example:
+
+```python
+from fastmcp import FastMCP
+from fastmcp.server.dependencies import get_http_headers
+
+mcp = FastMCP(name="Demo")
+
+@mcp.tool
+async def who_am_i() -> dict:
+	headers = get_http_headers()
+	auth = headers.get("authorization", "") if headers else ""
+	return {
+		"has_auth": bool(auth),
+		"auth_is_bearer": auth.lower().startswith("bearer "),
+		"user_agent": headers.get("user-agent") if headers else None,
+	}
+```
+
+This mirrors the mechanism used by the SonarQube tools to resolve the active
+token for each request.
+
+### VS Code MCP client configuration
+
+If you are using the VS Code built‑in MCP client (or an extension that reads a
+`mcp.json` style manifest), you can prompt the user for their SonarQube token
+and pass it as a bearer header. Example configuration snippet:
+
+```json
+{
+	"servers": {
+		"sonarqube": {
+			"url": "http://localhost:8765/mcp",
+			"type": "http",
+			"headers": {
+				"Authorization": "Bearer ${input:sonarqube_token}"
+			}
+		}
+	},
+	"inputs": [
+		{
+			"id": "sonarqube_token",
+			"type": "promptString",
+			"description": "SonarQube Token"
+		}
+	]
+}
+```
+
+Notes:
+
+- The `${input:...}` placeholder ensures the token is not stored in plain text
+	in the config file; the user will be prompted in VS Code.
+- If you prefer not to prompt each time, you can instead set the environment
+	variable `SONARQUBE_TOKEN` and omit the `headers` block (less granular for
+	multi-user scenarios).
+- When using a remote SonarQube instance over HTTPS behind a corporate CA,
+	ensure your Python environment trusts that CA (e.g. via `REQUESTS_CA_BUNDLE`
+	/ `SSL_CERT_FILE`).
 
 ### Available tools
 

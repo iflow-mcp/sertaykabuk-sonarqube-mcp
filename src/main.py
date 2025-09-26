@@ -7,6 +7,7 @@ import sys
 from typing import Annotated, Optional
 
 from fastmcp import FastMCP
+from fastmcp.server.dependencies import get_http_headers
 from fastmcp.exceptions import ToolError
 
 from .sonarqube import (
@@ -25,13 +26,34 @@ def create_mcp(
     config: Optional[SonarQubeConfig] = None,
     client: Optional[SonarQubeClient] = None,
 ) -> FastMCP:
-    """Create and configure the FastMCP server instance."""
+    """Create and configure the FastMCP server instance.
+
+    Authentication strategy:
+    1. If an Authorization header with a Bearer token is present on the
+       incoming HTTP/SSE request it is used for that call.
+    2. Otherwise we fall back to the static token configured via
+       environment variable.
+
+    This allows each user/agent session to supply their own SonarQube token
+    (with appropriate scoped permissions) when connecting over HTTP, while
+    still supporting stdio transports where a global token is required.
+    """
 
     if config is None:
         config = SonarQubeConfig.from_env()
 
     mcp = FastMCP("SonarQube")
-    sonar_client = client or SonarQubeClient(config)
+
+    def _header_token_provider() -> Optional[str]:
+        headers = get_http_headers()
+        auth = headers.get("authorization") if headers else None
+        if not auth:
+            return None
+        if auth.lower().startswith("bearer "):
+            return auth.split(" ", 1)[1]
+        return None
+
+    sonar_client = client or SonarQubeClient(config, token_provider=_header_token_provider)
 
     @mcp.tool(description="Fetch a single issue and enrich it with rule metadata.")
     async def get_issue_context(

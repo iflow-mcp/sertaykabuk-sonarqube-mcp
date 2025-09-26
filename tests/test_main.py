@@ -54,6 +54,80 @@ async def test_get_issue_context_tool_returns_markdown():
 
 
 @pytest.mark.asyncio
+async def test_token_from_headers(monkeypatch):
+    """Ensure that when an Authorization header is present it is preferred."""
+    config = SonarQubeConfig(
+        base_url="https://sonarqube.example.com",
+        token="fallback-token",
+    )
+
+    # Simulate headers early so create_mcp picks it up for token provider.
+    from fastmcp.server import dependencies
+
+    def fake_headers():
+        return {"authorization": "Bearer dynamic-token"}
+
+    monkeypatch.setattr(dependencies, "get_http_headers", fake_headers)
+
+    # Provide a stub client manually so no real HTTP occurs.
+    class StubClient:
+        def __init__(self, cfg):
+            self._config = cfg
+            self._token_provider_called = False
+            self.tokens_seen = []
+
+        async def search_issues(self, **filters):
+            # Reproduce token resolution logic mirroring SonarQubeClient._get_json
+            token = fake_headers().get("authorization").split(" ", 1)[1]
+            self.tokens_seen.append(token)
+            return {"issues": [], "components": []}
+
+    from src.main import create_mcp as _create
+
+    stub = StubClient(config)
+    server = _create(config=config, client=stub)  # inject stub
+
+    async with Client(server) as client_obj:
+        await client_obj.call_tool("search_issues", {"issue_keys": ["ISSUE-1"]})
+
+    assert stub.tokens_seen == ["dynamic-token"]
+
+
+@pytest.mark.asyncio
+async def test_token_fallback_when_no_header(monkeypatch):
+    config = SonarQubeConfig(
+        base_url="https://sonarqube.example.com",
+        token="fallback-token",
+    )
+    from fastmcp.server import dependencies
+
+    def empty_headers():
+        return {}
+
+    monkeypatch.setattr(dependencies, "get_http_headers", empty_headers)
+
+    class StubClient:
+        def __init__(self, cfg):
+            self._config = cfg
+            self.tokens_seen = []
+
+        async def search_issues(self, **filters):
+            # No header token so fallback should be used
+            self.tokens_seen.append(self._config.token)
+            return {"issues": [], "components": []}
+
+    from src.main import create_mcp as _create
+
+    stub = StubClient(config)
+    server = _create(config=config, client=stub)
+
+    async with Client(server) as client_obj:
+        await client_obj.call_tool("search_issues", {"issue_keys": ["ISSUE-1"]})
+
+    assert stub.tokens_seen == ["fallback-token"]
+
+
+@pytest.mark.asyncio
 async def test_search_issues_tool_formats_results():
     config = SonarQubeConfig(
         base_url="https://sonarqube.example.com",

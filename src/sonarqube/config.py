@@ -16,10 +16,16 @@ DEFAULT_TIMEOUT = 15.0
 
 @dataclass(slots=True)
 class SonarQubeConfig:
-    """Runtime configuration required to connect to a SonarQube instance."""
+    """Runtime configuration required to connect to a SonarQube instance.
+
+    The authentication token is now optional at construction time to enable
+    per-request bearer tokens sourced from incoming HTTP headers. When
+    running over non-HTTP transports (e.g. stdio) you may still provide a
+    static token for all requests.
+    """
 
     base_url: str
-    token: str
+    token: Optional[str]
     timeout: float = DEFAULT_TIMEOUT
 
     @classmethod
@@ -47,16 +53,12 @@ class SonarQubeConfig:
         """
 
         base_url = _read_env(base_url_var)
-        token = _read_env(token_var)
+        token = _read_env(token_var)  # Optional – may be provided via headers
         timeout_value = os.getenv(timeout_var)
 
         if not base_url:
             raise MissingConfigurationError(
                 f"Environment variable '{base_url_var}' must be set."
-            )
-        if not token:
-            raise MissingConfigurationError(
-                f"Environment variable '{token_var}' must be set."
             )
 
         timeout = (
@@ -65,7 +67,11 @@ class SonarQubeConfig:
             else DEFAULT_TIMEOUT
         )
 
-        return cls(base_url=_normalize_base_url(base_url), token=token, timeout=timeout)
+        return cls(
+            base_url=_normalize_base_url(base_url),
+            token=token,  # May be None – resolved per request from headers
+            timeout=timeout,
+        )
 
     @staticmethod
     def _parse_timeout(value: str) -> float:

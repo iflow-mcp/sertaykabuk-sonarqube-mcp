@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Optional
+from typing import Any, Dict, Mapping, Optional, Callable
 
 import httpx
 
@@ -31,10 +31,21 @@ class SonarQubeIssueNotFound(SonarQubeAPIError):
 
 
 class SonarQubeClient:
-    """Small wrapper around the SonarQube REST API."""
+    """Small wrapper around the SonarQube REST API.
 
-    def __init__(self, config: SonarQubeConfig) -> None:
+    Authentication now supports either a static token on the configuration or
+    a dynamic token provider which is invoked for every request (used to pull
+    per-user bearer tokens from incoming HTTP headers).
+    """
+
+    def __init__(
+        self,
+        config: SonarQubeConfig,
+        *,
+        token_provider: Optional[Callable[[], Optional[str]]] = None,
+    ) -> None:
         self._config = config
+        self._token_provider = token_provider
 
     async def search_issues(self, **filters: Any) -> Dict[str, Any]:
         """Search for issues using SonarQube's /api/issues/search endpoint."""
@@ -66,10 +77,18 @@ class SonarQubeClient:
         *,
         params: Optional[Mapping[str, Any]] = None,
     ) -> Dict[str, Any]:
-        headers = {
-            "Authorization": f"Bearer {self._config.token}",
-            "Accept": "application/json",
-        }
+        token = None
+        if self._token_provider is not None:
+            try:
+                token = self._token_provider()
+            except Exception:  # pragma: no cover - defensive
+                token = None
+        if token is None:
+            token = self._config.token
+
+        headers = {"Accept": "application/json"}
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
 
         async with httpx.AsyncClient(
             base_url=self._config.base_url,
