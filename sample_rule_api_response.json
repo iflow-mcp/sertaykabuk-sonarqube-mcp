@@ -1,0 +1,51 @@
+{
+	"rule": {
+		"key": "csharpsquid:S2178",
+		"repo": "csharpsquid",
+		"name": "Short-circuit logic should be used in boolean contexts",
+		"createdAt": "2019-02-26T09:04:48+0000",
+		"severity": "BLOCKER",
+		"status": "READY",
+		"isTemplate": false,
+		"tags": [],
+		"sysTags": [],
+		"lang": "cs",
+		"langName": "C#",
+		"params": [],
+		"defaultDebtRemFnType": "CONSTANT_ISSUE",
+		"debtRemFnType": "CONSTANT_ISSUE",
+		"type": "CODE_SMELL",
+		"defaultRemFnType": "CONSTANT_ISSUE",
+		"defaultRemFnBaseEffort": "5min",
+		"remFnType": "CONSTANT_ISSUE",
+		"remFnBaseEffort": "5min",
+		"remFnOverloaded": false,
+		"scope": "MAIN",
+		"isExternal": false,
+		"descriptionSections": [
+			{
+				"key": "root_cause",
+				"content": "<p><a href=\"https://en.wikipedia.org/wiki/Short-circuit_evaluation\">Short-circuit evaluation</a> is an evaluation strategy for <a\nhref=\"https://en.wikipedia.org/wiki/Logical_connective\">Boolean operators</a>, that doesn’t evaluates the second argument of the operator if it is not\nneeded to determine the result of the operation.</p>\n<p>C# provides logical operators that implement short-circuit evaluation: <code>&amp;&amp;</code> and <code>||</code>, as well as non-short-circuit\nversions: <code>&amp;</code> and <code>|</code>. Unlike short-circuit operators, non-short-circuit ones evaluate both operands and afterwards perform\nthe logical operation.</p>\n<p>For example <code>false &amp;&amp; FunctionCall()</code> always results in <code>false</code>, even when <code>FunctionCall</code> invocation would\nraise an exception. Instead, <code>false &amp; FunctionCall()</code> also evaluates <code>FunctionCall()</code>, and results in an exception if\n<code>FunctionCall()</code> invocation raises an exception.</p>\n<p>Similarly, <code>true || FunctionCall()</code> always results in <code>true</code>, no matter what the return value of <code>FunctionCall()</code>\nwould be.</p>\n<p>The use of non-short-circuit logic in a boolean context is likely a mistake - one that could cause serious program errors as conditions are\nevaluated under the wrong circumstances.</p>"
+			},
+			{
+				"key": "how_to_fix",
+				"content": "<h4>Noncompliant code example</h4>\n<pre data-diff-id=\"1\" data-diff-type=\"noncompliant\">\nif (GetTrue() | GetFalse()) // Noncompliant: both sides evaluated\n{\n}\n</pre>\n<h4>Compliant solution</h4>\n<pre data-diff-id=\"1\" data-diff-type=\"compliant\">\nif (GetTrue() || GetFalse()) // Compliant: short-circuit logic used\n{\n}\n</pre>"
+			},
+			{
+				"key": "resources",
+				"content": "<h3>Documentation</h3>\n<ul>\n  <li> <a href=\"https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/boolean-logical-operators\">Boolean logical operators -\n  AND, OR, NOT, XOR</a> </li>\n  <li> <a href=\"https://en.wikipedia.org/wiki/Short-circuit_evaluation\">Short-circuit evaluation</a> </li>\n  <li> <a href=\"https://en.wikipedia.org/wiki/Logical_connective\">Boolean operators</a> </li>\n</ul>\n<h3>Articles &amp; blog posts</h3>\n<ul>\n  <li> <a href=\"https://ericlippert.com/2015/11/02/when-would-you-use-on-a-bool/\">Eric Lippert’s blog - When would you use &amp; on a bool?</a> </li>\n</ul>"
+			}
+		],
+		"educationPrinciples": [],
+		"updatedAt": "2024-12-06T10:43:49+0000",
+		"cleanCodeAttribute": "LOGICAL",
+		"cleanCodeAttributeCategory": "INTENTIONAL",
+		"impacts": [
+			{
+				"softwareQuality": "MAINTAINABILITY",
+				"severity": "BLOCKER"
+			}
+		]
+	},
+	"actives": []
+}

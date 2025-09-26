@@ -1,0 +1,72 @@
+{
+	"total": 1,
+	"p": 1,
+	"ps": 100,
+	"paging": {
+		"pageIndex": 1,
+		"pageSize": 100,
+		"total": 1
+	},
+	"effortTotal": 5,
+	"issues": [
+		{
+			"key": "d671f45f-2692-4420-b815-ebf754c25046",
+			"rule": "csharpsquid:S2178",
+			"severity": "BLOCKER",
+			"component": "Agrega-Server:src/server/Common/Utility/IpRangeHelper.cs",
+			"project": "Agrega-Server",
+			"line": 21,
+			"hash": "9e441e42708bb515248495c933395a32",
+			"textRange": {
+				"startLine": 21,
+				"endLine": 21,
+				"startOffset": 19,
+				"endOffset": 20
+			},
+			"flows": [],
+			"status": "OPEN",
+			"message": "Correct this '|' to '||' and extract the right operand to a variable if it should always be evaluated.",
+			"effort": "5min",
+			"debt": "5min",
+			"assignee": "ali.kayhan",
+			"author": "ali.kayhan@d-teknoloji.com.tr",
+			"tags": [],
+			"creationDate": "2024-04-03T14:42:00+0000",
+			"updateDate": "2025-03-26T06:06:33+0000",
+			"type": "CODE_SMELL",
+			"scope": "MAIN",
+			"quickFixAvailable": false,
+			"messageFormattings": [],
+			"codeVariants": [],
+			"cleanCodeAttribute": "LOGICAL",
+			"cleanCodeAttributeCategory": "INTENTIONAL",
+			"impacts": [
+				{
+					"softwareQuality": "MAINTAINABILITY",
+					"severity": "BLOCKER"
+				}
+			],
+			"issueStatus": "OPEN",
+			"prioritizedRule": false,
+			"fromSonarQubeUpdate": false
+		}
+	],
+	"components": [
+		{
+			"key": "Agrega-Server:src/server/Common/Utility/IpRangeHelper.cs",
+			"enabled": true,
+			"qualifier": "FIL",
+			"name": "IpRangeHelper.cs",
+			"longName": "src/server/Common/Utility/IpRangeHelper.cs",
+			"path": "src/server/Common/Utility/IpRangeHelper.cs"
+		},
+		{
+			"key": "Agrega-Server",
+			"enabled": true,
+			"qualifier": "TRK",
+			"name": "[VEGA] Agrega",
+			"longName": "[VEGA] Agrega"
+		}
+	],
+	"facets": []
+}
