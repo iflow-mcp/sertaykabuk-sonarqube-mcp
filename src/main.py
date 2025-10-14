@@ -223,19 +223,6 @@ def create_mcp(
             "issues": issues,
         }
 
-    @mcp.tool(description="Retrieve metadata for a SonarQube rule.")
-    async def get_rule(
-        rule_key: Annotated[str, "Rule key such as csharpsquid:S2178"]
-    ) -> dict:
-        try:
-            payload = await sonar_client.fetch_rule(rule_key)
-        except SonarQubeAPIError as exc:
-            raise ToolError(str(exc)) from exc
-        rule_payload = payload.get("rule") if isinstance(payload, dict) else None
-        if rule_payload is None:
-            raise ToolError(f"Rule '{rule_key}' not found")
-        return rule_payload
-
     return mcp
 
 
