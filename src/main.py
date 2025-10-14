@@ -6,6 +6,9 @@ import argparse
 import sys
 from typing import Annotated, Optional
 
+from dotenv import load_dotenv, find_dotenv
+load_dotenv(find_dotenv())
+
 from fastmcp import FastMCP
 from fastmcp.server.dependencies import get_http_headers
 from fastmcp.exceptions import ToolError
