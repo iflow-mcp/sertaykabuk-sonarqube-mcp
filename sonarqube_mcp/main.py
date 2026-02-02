@@ -13,7 +13,7 @@ from fastmcp import FastMCP
 from fastmcp.server.dependencies import get_http_headers
 from fastmcp.exceptions import ToolError
 
-from .sonarqube import (
+from sonarqube_mcp.sonarqube import (
     MissingConfigurationError,
     SonarQubeAPIError,
     SonarQubeClient,
